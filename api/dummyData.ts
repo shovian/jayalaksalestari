@@ -1,4 +1,4 @@
-import { TInventoryItem } from "../../../(types)/TInventoryItem";
+import { TInventoryItem } from "../(types)/TInventoryItem";
 
 const dummyData: TInventoryItem[] = [
   {

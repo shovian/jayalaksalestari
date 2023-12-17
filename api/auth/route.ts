@@ -8,7 +8,7 @@ import {
   where,
   getDocs,
 } from "firebase/firestore";
-import { TUserLogin } from "../../../../(types)/TUserLogin";
+import { TUserLogin } from "../../(types)/TUserLogin";
 
 // // Your web app's Firebase configuration
 const firebaseConfig = {
