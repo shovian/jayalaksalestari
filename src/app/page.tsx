@@ -8,5 +8,5 @@ export default function Page() {
   router.push("/auth");
 
   // Return null or a placeholder component since this page will be redirected
-  return null;
+  return <div></div>;
 }
