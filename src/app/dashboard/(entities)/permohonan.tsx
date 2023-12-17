@@ -1,4 +1,4 @@
-import { app } from "@/app/context/FirebaseContext";
+import { app } from "@/app/(context)/FirebaseContext";
 import {
   Timestamp,
   collection,
