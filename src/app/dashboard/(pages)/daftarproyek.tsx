@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ITableColumn } from "@/app/interfaces/ITableColumn";
+import { ITableColumn } from "@/app/(interfaces)/ITableColumn";
 import { Proyek } from "../(entities)/proyek";
 import { ProyekTable } from "../(component)/table";
 

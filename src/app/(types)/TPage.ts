@@ -1,4 +1,4 @@
-import { ITable } from "../interfaces/ITable";
+import { ITable } from "../(interfaces)/ITable";
 
 export type TPage = {
   canAdd?: boolean;

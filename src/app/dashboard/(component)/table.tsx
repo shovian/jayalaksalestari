@@ -1,7 +1,7 @@
-import { ITableColumn } from "@/app/interfaces/ITableColumn";
-import Table from "@/components/Table";
+import { ITableColumn } from "@/app/(interfaces)/ITableColumn";
+import Table from "@/(components)/Table";
 import { Inventori } from "../(entities)/inventori";
-import Popup from "@/components/Popup";
+import Popup from "@/(components)/Popup";
 import { SetStateAction, useEffect, useState } from "react";
 import { Barang } from "../(entities)/barang";
 import { Proyek } from "../(entities)/proyek";
