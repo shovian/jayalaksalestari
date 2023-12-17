@@ -637,8 +637,8 @@ export const PengajuanTable = (props: { role?: String }) => {
                   </select>
                   {keperluanOrBarang[k] ? (
                     <select>
-                      {barangs.map((barang) => {
-                        return <option>{barang.name}</option>;
+                      {barangs.map((barang, key) => {
+                        return <option key={key}>{barang.name}</option>;
                       })}
                     </select>
                   ) : (
