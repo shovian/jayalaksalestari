@@ -3,7 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import React, { useEffect } from "react";
-import { FirebaseContext, app } from "./(context)/FirebaseContext";
+import { FirebaseContext, app } from "../../(context)/FirebaseContext";
 const inter = Inter({ subsets: ["latin"] });
 
 // export const metadata: Metadata = {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Inventori } from "../(entities)/inventori";
-import { ITableColumn } from "@/app/(interfaces)/ITableColumn";
+import { ITableColumn } from "../../../../(interfaces)/ITableColumn";
 import { BarangTable } from "../(component)/table";
 import { Proyek } from "../(entities)/proyek";
 import { Barang } from "../(entities)/barang";

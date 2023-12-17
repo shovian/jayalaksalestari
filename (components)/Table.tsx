@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import "./Table.css";
 import Pagination from "./Pagination";
-import { ITable } from "@/app/(interfaces)/ITable";
+import { ITable } from "../(interfaces)/ITable";
 
 const Table: React.FC<ITable> = ({
   columns,

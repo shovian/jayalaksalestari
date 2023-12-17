@@ -1,4 +1,4 @@
-import { TProject } from "../(types)/TProject";
+import { TProject } from "../../../(types)/TProject";
 
 const dummyProjects: TProject[] = [
   {
