@@ -43,7 +43,8 @@ export const BarangTable = (props: {
                   className="flex flex-col gap-4"
                   onSubmit={(e: any) => {
                     e.preventDefault();
-                    console.log(e.target.elements[1].value, customPopup); // this should be changed to put barang into project
+                    // console.log(e.target.elements[1].value, customPopup); // this should be changed to put barang into project
+
                     customPopup
                       ? Inventori.putBarangIntoProyek(
                           customPopup,
@@ -203,11 +204,9 @@ export const BarangTable = (props: {
           setEditPopup(id);
         }}
         onDelete={(id) => {
-          console.log(id);
           Inventori.deleteBarangById(id);
         }}
         onCustom={(id) => {
-          console.log(id);
           setCustomPopup(id);
         }}
         customAction={
@@ -341,7 +340,6 @@ export const ProyekTable = (props: { header: ITableColumn[]; data: any[] }) => {
                             </div>
                           );
                         });
-                      console.log(barang.id);
                     }}
                     className="bg-slate-200 p-2 rounded-lg cursor-pointer"
                   >
@@ -440,7 +438,7 @@ export const ProyekTable = (props: { header: ITableColumn[]; data: any[] }) => {
           setEditPopup(id);
         }}
         onDelete={(id) => {
-          console.log(id);
+          Proyek.deleteProyekById(id);
           // new Proyek().deleteBarangById(id);
         }}
       ></Table>

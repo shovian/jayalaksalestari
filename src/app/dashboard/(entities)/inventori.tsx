@@ -77,7 +77,7 @@ export class Inventori {
   ) {
     const oldBarang = await Inventori.getBarangById(idBarang);
     delete oldBarang["id"];
-    console.log({ ...oldBarang, idProyek: idProyek });
+    // console.log({ ...oldBarang, idProyek: idProyek });
     Inventori.updateBarangById(idBarang, {
       ...oldBarang,
       idProyek: idProyek,
