@@ -83,32 +83,33 @@ const Dashboard = () => {
           { name: "Absensi", page: <AbsensiPage /> },
           { name: "Pengajuan Dana", page: <Pengajuan /> },
         ];
-  return currentUserRole ? (
-    alreadyAbsensi ? (
-      <div className="text-xs lg:text-base">
-        <Sidebar pages={pageList} />
-      </div>
-    ) : (
-      <div className="w-screen h-screen flex items-center justify-center flex-col">
-        {"Absen dulu"}
-        <button
-          className="text-slate-500"
-          onClick={() => {
-            id ? Absensi.setStatusByIdKaryawan(id, "hadir") : {};
-          }}
-        >
-          Saya hadir!
-        </button>
-      </div>
-    )
-  ) : (
-    <div className="w-screen h-screen flex items-center justify-center flex-col">
-      {"You're unauthorized!"}
-      <a className="text-slate-500" href="/auth">
-        Back to LogIn
-      </a>
-    </div>
-  );
+  // return currentUserRole ? (
+  //   alreadyAbsensi ? (
+  //     <div className="text-xs lg:text-base">
+  //       <Sidebar pages={pageList} />
+  //     </div>
+  //   ) : (
+  //     <div className="w-screen h-screen flex items-center justify-center flex-col">
+  //       {"Absen dulu"}
+  //       <button
+  //         className="text-slate-500"
+  //         onClick={() => {
+  //           id ? Absensi.setStatusByIdKaryawan(id, "hadir") : {};
+  //         }}
+  //       >
+  //         Saya hadir!
+  //       </button>
+  //     </div>
+  //   )
+  // ) : (
+  //   <div className="w-screen h-screen flex items-center justify-center flex-col">
+  //     {"You're unauthorized!"}
+  //     <a className="text-slate-500" href="/auth">
+  //       Back to LogIn
+  //     </a>
+  //   </div>
+  // );
+  return <div></div>;
 };
 
 export default Dashboard;
