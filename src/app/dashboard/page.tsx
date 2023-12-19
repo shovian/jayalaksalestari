@@ -94,10 +94,7 @@ const Dashboard = () => {
         <button
           className="text-slate-500"
           onClick={() => {
-            Absensi.setStatusByIdKaryawan(
-              User.getCurrentUserId() as string,
-              "hadir"
-            );
+            id ? Absensi.setStatusByIdKaryawan(id, "hadir") : {};
           }}
         >
           Saya hadir!
