@@ -1,6 +1,6 @@
 import { AbsensiTable } from "../(component)/table";
 
-const Absensi = () => {
+const AbsensiPage = () => {
   return (
     <div className="flex justify-center items-center h-full w-full ">
       <AbsensiTable></AbsensiTable>
@@ -8,4 +8,4 @@ const Absensi = () => {
   );
 };
 
-export default Absensi;
+export default AbsensiPage;

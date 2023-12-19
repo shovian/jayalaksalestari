@@ -32,7 +32,7 @@ const LoginPage = () => {
       headers: { "Content-type": "application/json" },
       body: JSON.stringify(params),
     });
-    const data: { res: String } = await res.json();
+    const data: { res: { id: String; role: String } } = await res.json();
 
     // Perform any necessary form validation or data processing
     // e.g., validate username and password, make API requests, etc.
@@ -59,8 +59,9 @@ const LoginPage = () => {
     setPassword("");
     // Handle further actions, such as displaying success messages or navigating to another page
 
-    User.setCurrentUserRole(data.res);
+    User.setCurrentUserRole(data.res.role);
 
+    User.setCurrentUserId(data.res.id);
     data.res === undefined ? console.log("failed") : router.push("/dashboard");
   };
   return (

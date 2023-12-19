@@ -3,16 +3,40 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "./(component)/sidebar";
 import DaftarBarang from "./(pages)/daftarbarang";
 import DaftarProyek from "./(pages)/daftarproyek";
-import Absensi from "./(pages)/absensi";
+import AbsensiPage from "./(pages)/halamanabsensi";
 import Pengajuan from "./(pages)/pengajuandana";
 import Pendanaan from "./(pages)/daftardanatersetujui";
 import Persetujuan from "./(pages)/persetujuanDana";
 import { User } from "./(entities)/user";
+import { Absensi } from "./(entities)/absensi";
 
 const Dashboard = () => {
+  const id = User.getCurrentUserId();
+  const role = User.getCurrentUserRole();
+  const [alreadyAbsensi, setAlreadyAbsensi] = useState(false);
+  Absensi.subscribeStatus(id as string, setAlreadyAbsensi);
+  role == "managergudang" || role == "staffgudang"
+    ? Absensi.getLatestDate().then((date: Date) => {
+        const nowDate = new Date(Date.now());
+        const isLatestDate = date.getDate() === nowDate.getDate();
+        const isLatestMonth = date.getMonth() === nowDate.getMonth();
+        const isLatestFullYear = date.getFullYear() === nowDate.getFullYear();
+        if (isLatestDate && isLatestMonth && isLatestFullYear) {
+          Absensi.getLatestAbsensiStatusByIdKaryawan(
+            User.getCurrentUserId()
+          ).then((status) => {
+            setAlreadyAbsensi(status === "hadir");
+          });
+        } else {
+          if (nowDate.getHours() >= 8) {
+            Absensi.assignNewAbsensi();
+          }
+        }
+      })
+    : {};
   const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
   useEffect(() => {
-    const tempUserRole = User.getCurrentUserRole();
+    const tempUserRole = role;
     if (tempUserRole !== undefined) {
       setCurrentUserRole(tempUserRole);
     }
@@ -22,7 +46,7 @@ const Dashboard = () => {
       ? [
           { name: "Daftar Barang", page: <DaftarBarang /> },
           { name: "Daftar Proyek", page: <DaftarProyek /> },
-          { name: "Absensi", page: <Absensi /> },
+          { name: "Absensi", page: <AbsensiPage /> },
           { name: "Daftar Dana Tersetujui", page: <Pendanaan /> },
           { name: "Persetujuan Dana", page: <Persetujuan /> },
           { name: "Pengajuan Dana", page: <Pengajuan /> },
@@ -31,7 +55,7 @@ const Dashboard = () => {
       ? [
           { name: "Daftar Barang", page: <DaftarBarang /> },
           { name: "Daftar Proyek", page: <DaftarProyek /> },
-          { name: "Absensi", page: <Absensi /> },
+          { name: "Absensi", page: <AbsensiPage /> },
           { name: "Persetujuan Dana", page: <Persetujuan /> },
         ]
       : currentUserRole === "adminkeuangan"
@@ -44,23 +68,42 @@ const Dashboard = () => {
       ? [
           { name: "Daftar Barang", page: <DaftarBarang /> },
           { name: "Daftar Proyek", page: <DaftarProyek /> },
-          { name: "Absensi", page: <Absensi /> },
+          { name: "Absensi", page: <AbsensiPage /> },
         ]
       : currentUserRole === "managergudang"
       ? [
           { name: "Daftar Barang", page: <DaftarBarang /> },
           { name: "Daftar Proyek", page: <DaftarProyek /> },
-          { name: "Absensi", page: <Absensi /> },
+          { name: "Absensi", page: <AbsensiPage /> },
           { name: "Pengajuan Dana", page: <Pengajuan /> },
         ]
       : [
           { name: "Daftar Barang", page: <DaftarBarang /> },
           { name: "Daftar Proyek", page: <DaftarProyek /> },
-          { name: "Absensi", page: <Absensi /> },
+          { name: "Absensi", page: <AbsensiPage /> },
           { name: "Pengajuan Dana", page: <Pengajuan /> },
         ];
   return currentUserRole ? (
-    <Sidebar pages={pageList} />
+    alreadyAbsensi ? (
+      <div className="text-xs lg:text-base">
+        <Sidebar pages={pageList} />
+      </div>
+    ) : (
+      <div className="w-screen h-screen flex items-center justify-center flex-col">
+        {"Absen dulu"}
+        <button
+          className="text-slate-500"
+          onClick={() => {
+            Absensi.setStatusByIdKaryawan(
+              User.getCurrentUserId() as string,
+              "hadir"
+            );
+          }}
+        >
+          Saya hadir!
+        </button>
+      </div>
+    )
   ) : (
     <div className="w-screen h-screen flex items-center justify-center flex-col">
       {"You're unauthorized!"}

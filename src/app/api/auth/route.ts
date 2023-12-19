@@ -40,16 +40,19 @@ export async function POST(request: NextRequest) {
     let userData: TUserLogin | undefined;
     querySnapshot.forEach(async (user) => {
       const data = user.data() as TUserLogin;
+      data["id"] = user.id;
       userData = data;
     });
-    const authenficated = userData
+    const authentificated = userData
       ? await bcrypt
           .compare(body.password, userData.password)
           .then((result: boolean) => {
             return result;
           })
       : false;
-    const res = (await authenficated) ? userData?.role : null;
+    const res = (await authentificated)
+      ? { id: userData?.id, role: userData?.role }
+      : null;
     if (res !== null) {
       return NextResponse.json({ success: true, res }, { status: 200 });
     } else {

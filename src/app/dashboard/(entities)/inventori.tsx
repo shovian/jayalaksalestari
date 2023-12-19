@@ -16,6 +16,28 @@ import { Barang } from "./barang";
 const db = getFirestore(app);
 
 export class Inventori {
+  private static async checkSameProduct(products: Barang[]) {
+    products.map((product, k) => {
+      products.map((productNested, kn) => {
+        if (k !== kn) {
+          if (product.name === productNested.name) {
+            if (product.idProyek === productNested.idProyek) {
+              if (product.description === productNested.description) {
+                const productQuantity =
+                  parseInt(product.quantity as string) +
+                  parseInt(productNested.quantity as string);
+                Inventori.deleteBarangById(productNested.id as String);
+                Inventori.updateBarangById(product.id as String, {
+                  ...product,
+                  quantity: productQuantity.toString(),
+                });
+              }
+            }
+          }
+        }
+      });
+    });
+  }
   public static async subscribeDatabase(
     callback: (inventori: Barang[]) => void
   ) {
@@ -34,6 +56,7 @@ export class Inventori {
         barang["description"] = fetchedData.description;
         inventori.push(barang);
       });
+      Inventori.checkSameProduct(inventori);
       callback(inventori);
     });
   }
@@ -78,6 +101,13 @@ export class Inventori {
     const oldBarang = await Inventori.getBarangById(idBarang);
     delete oldBarang["id"];
 
+    if (
+      parseInt(oldBarang["quantity"] as string) <
+        parseInt(quantity as string) ||
+      isNaN(parseInt(quantity as string))
+    ) {
+      return;
+    }
     // console.log({ ...oldBarang, idProyek: idProyek });
     Inventori.updateBarangById(idBarang, {
       ...oldBarang,
@@ -87,7 +117,11 @@ export class Inventori {
     oldBarang["quantity"] = (
       parseInt(oldBarang.quantity as string) - parseInt(quantity as string)
     ).toString();
-    Inventori.createBarang(oldBarang);
+
+    parseInt(oldBarang["quantity"] as string) > 0
+      ? Inventori.createBarang(oldBarang)
+      : {};
+
     // const barang: Barang = {
     //   ...oldBarang,
     //   quantity: (

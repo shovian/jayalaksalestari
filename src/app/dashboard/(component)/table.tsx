@@ -7,6 +7,8 @@ import { Barang } from "../(entities)/barang";
 import { Proyek } from "../(entities)/proyek";
 import { Permohonan } from "../(entities)/permohonan";
 import { User } from "../(entities)/user";
+import { Absensi } from "../(entities)/absensi";
+import { Timestamp } from "firebase/firestore";
 
 export const BarangTable = (props: {
   header: ITableColumn[];
@@ -481,6 +483,30 @@ export const ProyekTable = (props: { header: ITableColumn[]; data: any[] }) => {
   );
 };
 export const AbsensiTable = () => {
+  const [data, setData] = useState([]);
+  const [shownData, setShownData] = useState([]);
+
+  useEffect(() => {
+    Absensi.subscribeDatabase(setData);
+  }, []);
+  useEffect(() => {
+    const tempData: any = [];
+    data.map((doc: any, k: number) => {
+      // console.log(k, doc);
+      doc &&
+        User.getNamaById(doc.idKaryawan as string).then((nama) => {
+          console.log(nama);
+          const tempDoc = doc;
+          tempDoc["nama"] = nama;
+          const tempDate = doc.date as Timestamp;
+          tempDoc["date"] = tempDate.toDate().toUTCString();
+          tempData.push(tempDoc);
+          if (k == data.length - 1) {
+            setShownData(tempData);
+          }
+        });
+    });
+  }, [data]);
   return (
     <Table
       columns={[
@@ -488,7 +514,7 @@ export const AbsensiTable = () => {
         { label: "Status Absensi", key: "status" },
         { label: "Tanggal", key: "date" },
       ]}
-      data={[]}
+      data={shownData}
       actionable={false}
     ></Table>
   );
