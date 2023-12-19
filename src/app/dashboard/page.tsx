@@ -14,28 +14,28 @@ const Dashboard = () => {
   const id = User.getCurrentUserId();
   const role = User.getCurrentUserRole();
   const [alreadyAbsensi, setAlreadyAbsensi] = useState(false);
-  Absensi.subscribeStatus(id as string, setAlreadyAbsensi);
-  role == "managergudang" || role == "staffgudang"
-    ? Absensi.getLatestDate().then((date: Date) => {
-        const nowDate = new Date(Date.now());
-        const isLatestDate = date.getDate() === nowDate.getDate();
-        const isLatestMonth = date.getMonth() === nowDate.getMonth();
-        const isLatestFullYear = date.getFullYear() === nowDate.getFullYear();
-        if (isLatestDate && isLatestMonth && isLatestFullYear) {
-          Absensi.getLatestAbsensiStatusByIdKaryawan(
-            User.getCurrentUserId()
-          ).then((status) => {
-            setAlreadyAbsensi(status === "hadir");
-          });
-        } else {
-          if (nowDate.getHours() >= 8) {
-            Absensi.assignNewAbsensi();
-          }
-        }
-      })
-    : {};
   const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
   useEffect(() => {
+    Absensi.subscribeStatus(id as string, setAlreadyAbsensi);
+    role == "managergudang" || role == "staffgudang"
+      ? Absensi.getLatestDate().then((date: Date) => {
+          const nowDate = new Date(Date.now());
+          const isLatestDate = date.getDate() === nowDate.getDate();
+          const isLatestMonth = date.getMonth() === nowDate.getMonth();
+          const isLatestFullYear = date.getFullYear() === nowDate.getFullYear();
+          if (isLatestDate && isLatestMonth && isLatestFullYear) {
+            Absensi.getLatestAbsensiStatusByIdKaryawan(
+              User.getCurrentUserId()
+            ).then((status) => {
+              setAlreadyAbsensi(status === "hadir");
+            });
+          } else {
+            if (nowDate.getHours() >= 8) {
+              Absensi.assignNewAbsensi();
+            }
+          }
+        })
+      : {};
     const tempUserRole = role;
     if (tempUserRole !== undefined) {
       setCurrentUserRole(tempUserRole);
