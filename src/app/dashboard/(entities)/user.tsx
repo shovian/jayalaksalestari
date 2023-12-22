@@ -17,6 +17,7 @@ export class User {
   username?: String;
   password?: String;
   role?: String;
+  saldo?: String;
   public login(username: String, password: String) {
     //login logic here
   }
@@ -32,6 +33,12 @@ export class User {
   }
   public static setCurrentUserId(id: String) {
     localStorage.setItem("id", id as string);
+  }
+  public static deleteCurrentUserRole() {
+    localStorage.removeItem("role");
+  }
+  public static deleteCurrentUserId() {
+    localStorage.removeItem("id");
   }
   public static async getNamaById(id: String) {
     const nama: any = [];

@@ -532,9 +532,14 @@ export const PengajuanTable = (props: { role?: String }) => {
   useEffect(() => {
     customPopup &&
       Permohonan.getPermohonanById(customPopup as String).then((permohonan) => {
+        if (props.role === "adminkeuangan") {
+          User.getUserById(permohonan.idUser as string).then((user) => {
+            user.saldo = permohonan.totalDana;
+          });
+        }
         permohonan.setStatus(
           props.role === "adminkeuangan"
-            ? "Didanai"
+            ? "Dana Terkirim"
             : props.role === "pemilik"
             ? "Disetujui"
             : "Diajukan"

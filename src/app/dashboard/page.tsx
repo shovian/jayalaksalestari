@@ -11,7 +11,7 @@ import { User } from "./(entities)/user";
 import { Absensi } from "./(entities)/absensi";
 
 const Dashboard = () => {
-  const [alreadyAbsensi, setAlreadyAbsensi] = useState(false);
+  const [alreadyAbsensi, setAlreadyAbsensi] = useState<boolean>(false);
   const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
   useEffect(() => {
     const id = User.getCurrentUserId();
@@ -35,7 +35,7 @@ const Dashboard = () => {
             }
           }
         })
-      : {};
+      : setAlreadyAbsensi(true);
     const tempUserRole = role;
     if (tempUserRole !== undefined) {
       setCurrentUserRole(tempUserRole);

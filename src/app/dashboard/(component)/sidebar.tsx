@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { User } from "../(entities)/user";
 
 const Sidebar = (props: { pages: { name: String; page: JSX.Element }[] }) => {
   const [selectedPage, setSelectedPage] = useState(0);
@@ -26,6 +27,16 @@ const Sidebar = (props: { pages: { name: String; page: JSX.Element }[] }) => {
               </div>
             );
           })}
+          <div
+            onClick={() => {
+              User.deleteCurrentUserId();
+              User.deleteCurrentUserRole();
+              window.location.reload();
+            }}
+            className=" cursor-pointer px-8 py-2 flex mt-64 text-white w-full align-self-end bg-slate-800"
+          >
+            Logout
+          </div>
         </div>
         <div
           onClick={() => {
