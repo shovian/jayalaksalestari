@@ -46,14 +46,17 @@ export const BarangTable = (props: {
                   onSubmit={(e: any) => {
                     e.preventDefault();
                     // console.log(e.target.elements[1].value, customPopup); // this should be changed to put barang into project
+                    const idBarang = customPopup;
+                    const idProyek = e.target.elements[1].value;
+                    console.log(idProyek);
 
-                    customPopup
-                      ? Inventori.putBarangIntoProyek(
-                          customPopup,
-                          e.target.elements[1].value,
-                          e.target.elements[0].value
-                        )
-                      : {};
+                    // idBarang
+                    //   ? Inventori.putBarangIntoProyek(
+                    //       idBarang,
+                    //       idProyek,
+                    //       e.target.elements[0].value
+                    //     )
+                    //   : {};
                     setCustomPopupComponent(undefined);
                   }}
                   action="submit"
@@ -605,7 +608,12 @@ export const PengajuanTable = (props: { role?: String }) => {
         <button
           className="flex w-full bg-slate-500 p-4 justify-center items-center text-white rounded-lg mt-4"
           onClick={() => {
-            setTambahData("0");
+            const newPermohonan = new Permohonan();
+            newPermohonan["idUser"] = User.getCurrentUserId() || undefined;
+            newPermohonan["pengajuanDate"] = Timestamp.fromDate(new Date());
+            Permohonan.createPermohonan(newPermohonan).then((id) => {
+              setTambahData(id as string);
+            });
           }}
         >
           Buat Pengajuan
@@ -634,12 +642,14 @@ export const PengajuanTable = (props: { role?: String }) => {
               const data: any[] = [];
               const dataLength = e.target.elements.length;
               for (var i = 0; i < dataLength - 2; i++) {
-                data.push(e.target.elements[i].value);
+                // data.push(e.target.elements[i].value);
                 console.log(e.target.elements[i].value);
               }
               Permohonan.getPermohonanById(tambahData as String).then(
                 (permohonan: Permohonan) => {
-                  permohonan.setLinkDoc(JSON.stringify(data));
+                  console.log(permohonan);
+
+                  // permohonan.setLinkDoc(JSON.stringify(data));
                 }
               );
               //please add more mechanisms here
@@ -647,7 +657,9 @@ export const PengajuanTable = (props: { role?: String }) => {
           >
             {barangDiajukanLength.map((v, k) => {
               var a = 0;
-              keperluanOrBarang[k] = true;
+              if (keperluanOrBarang[k] == undefined)
+                keperluanOrBarang[k] = true;
+
               return (
                 <>
                   <select
@@ -659,12 +671,12 @@ export const PengajuanTable = (props: { role?: String }) => {
                       setForceRerender((prevState) => !prevState);
                     }}
                     name="Barang/Keperluan"
-                    id=""
+                    key={k}
                   >
                     <option value="barang">Barang</option>
                     <option value="keperluan">Keperluan Lain</option>
                   </select>
-                  {keperluanOrBarang[k] ? (
+                  {keperluanOrBarang[k] == true ? (
                     <select>
                       {barangs.map((barang, key) => {
                         return <option key={key}>{barang.name}</option>;

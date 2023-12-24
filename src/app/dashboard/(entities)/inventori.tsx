@@ -95,25 +95,35 @@ export class Inventori {
   }
   public static async putBarangIntoProyek(
     idBarang: String,
-    idProyek: String,
+    idProyek: String | undefined,
     quantity: String
   ) {
     const oldBarang = await Inventori.getBarangById(idBarang);
     delete oldBarang["id"];
+
+    // console.log(idBarang, idProyek);
 
     if (
       parseInt(oldBarang["quantity"] as string) <
         parseInt(quantity as string) ||
       isNaN(parseInt(quantity as string))
     ) {
+      console.log("cancelled");
+
       return;
     }
     // console.log({ ...oldBarang, idProyek: idProyek });
-    Inventori.updateBarangById(idBarang, {
-      ...oldBarang,
-      quantity: quantity,
-      idProyek: idProyek,
-    } as Barang);
+    const additionalData = idProyek
+      ? ({
+          ...oldBarang,
+          quantity: quantity,
+          idProyek: idProyek,
+        } as Barang)
+      : ({
+          ...oldBarang,
+          quantity: quantity,
+        } as Barang);
+    Inventori.updateBarangById(idBarang, additionalData);
     oldBarang["quantity"] = (
       parseInt(oldBarang.quantity as string) - parseInt(quantity as string)
     ).toString();

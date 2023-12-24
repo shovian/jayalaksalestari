@@ -23,10 +23,9 @@ const Dashboard = () => {
           const isLatestDate = date.getDate() === nowDate.getDate();
           const isLatestMonth = date.getMonth() === nowDate.getMonth();
           const isLatestFullYear = date.getFullYear() === nowDate.getFullYear();
+
           if (isLatestDate && isLatestMonth && isLatestFullYear) {
-            Absensi.getLatestAbsensiStatusByIdKaryawan(
-              User.getCurrentUserId()
-            ).then((status) => {
+            Absensi.getLatestAbsensiStatusByIdKaryawan(id).then((status) => {
               setAlreadyAbsensi(status === "hadir");
             });
           } else {

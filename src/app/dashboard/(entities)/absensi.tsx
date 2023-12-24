@@ -51,15 +51,21 @@ export class Absensi {
     const absRes = await getDocs(
       query(
         absRef,
-        where("idKaryawan", "==", id as string),
-        where("date", "==", latestDate)
+        where("idKaryawan", "==", id as string)
+        // where("date", "==", latestDate)
       )
     );
     absRes.forEach((abs) => {
       //   console.log(abs.data(), id);
 
-      const tempAbsRef = doc(db, "absensi", abs.id);
-      setDoc(tempAbsRef, { status: status }, { merge: true });
+      const fetchedData = abs.data() as Absensi;
+      if (
+        (fetchedData.date as Timestamp).toDate().toString() ===
+        latestDate.toString()
+      ) {
+        const tempAbsRef = doc(db, "absensi", abs.id);
+        setDoc(tempAbsRef, { status: status }, { merge: true });
+      }
     });
   }
   public static async getLatestAbsensiStatusByIdKaryawan(id: String | null) {
@@ -68,14 +74,18 @@ export class Absensi {
     const absRes = await getDocs(
       query(
         absRef,
-        where("idKaryawan", "==", id as string),
-        where("date", "==", latestDate)
+        where("idKaryawan", "==", id as string)
+        // where("date", "==", latestDate)
       )
     );
     const status: String[] = [];
     absRes.forEach((doc) => {
       const fetchedData = doc.data() as Absensi;
-      status.push(fetchedData.status as string);
+      if (
+        (fetchedData.date as Timestamp).toDate().toString() ===
+        latestDate.toString()
+      )
+        status.push(fetchedData.status as string);
     });
     return status[0];
   }

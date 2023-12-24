@@ -1,6 +1,7 @@
 import { app } from "../../../../(context)/FirebaseContext";
 import {
   Timestamp,
+  addDoc,
   collection,
   doc,
   getDoc,
@@ -37,10 +38,19 @@ export class Permohonan {
     const permRef = doc(db, "permohonan", this.id as string);
     await setDoc(permRef, { linkDoc: linkDoc }, { merge: true });
   }
+  public static async createPermohonan(data: Permohonan) {
+    const permRef = collection(db, "permohonan");
+    const permRes = await addDoc(permRef, { ...data });
+    return permRes.id;
+  }
   public static async getPermohonanById(id: String) {
+    console.log(id);
+
     const permRef = doc(db, "permohonan", id as string);
     const permRes = await getDoc(permRef);
     const fetchedData = permRes.data() as unknown as Permohonan;
+    console.log(fetchedData);
+
     return this.makeObject(id, fetchedData);
   }
   public static subscribeDatabase(callback: (data: Permohonan[]) => void) {
