@@ -5,7 +5,11 @@ const Sidebar = (props: { pages: { name: String; page: JSX.Element }[] }) => {
   const [selectedPage, setSelectedPage] = useState(0);
   const [isSidebarCollapsed, setIsSideBarCollapsed] = useState(true);
   const [saldo, setSaldo] = useState<String>();
-  useEffect(() => {});
+  useEffect(() => {
+    User.getUserById(User.getCurrentUserId() as string).then((user) => {
+      setSaldo(user.saldo);
+    });
+  });
 
   return (
     <div className={`flex flex-row h-screen w-screen`}>
@@ -15,9 +19,11 @@ const Sidebar = (props: { pages: { name: String; page: JSX.Element }[] }) => {
             isSidebarCollapsed ? " overflow-hidden w-[0%] hidden" : ""
           }`}
         >
-          <div className=" cursor-pointer px-8 py-2 flex mb-64 text-white w-full align-self-end bg-slate-800">
-            Saldo: {}
-          </div>
+          {saldo && (
+            <div className=" px-8 py-2 flex mb-10 text-white w-full align-self-end bg-slate-800">
+              Saldo: {saldo}
+            </div>
+          )}
           {props.pages.map((node, key) => {
             return (
               <div
@@ -39,7 +45,7 @@ const Sidebar = (props: { pages: { name: String; page: JSX.Element }[] }) => {
               User.deleteCurrentUserRole();
               window.location.reload();
             }}
-            className=" cursor-pointer px-8 py-2 flex mt-64 text-white w-full align-self-end bg-slate-800"
+            className=" cursor-pointer px-8 py-2 flex mt-10 text-white w-full align-self-end bg-slate-800"
           >
             Logout
           </div>
