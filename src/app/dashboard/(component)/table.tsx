@@ -9,7 +9,6 @@ import { Permohonan } from "../(entities)/permohonan";
 import { User } from "../(entities)/user";
 import { Absensi } from "../(entities)/absensi";
 import { Timestamp } from "firebase/firestore";
-
 import ImageUploading, { ImageListType } from "react-images-uploading";
 
 export const BarangTable = (props: {
@@ -563,7 +562,7 @@ export const PengajuanTable = (props: { role?: String }) => {
           User.getUserById(permohonan.idUser as string).then((user) => {
             user.saldo = permohonan.totalDana;
           });
-        } else if (props.role === "staff") {
+        } else if (props.role === "staffgudang") {
         }
         switch (props.role) {
           case "adminkeuangan": {
@@ -579,7 +578,6 @@ export const PengajuanTable = (props: { role?: String }) => {
         }
       });
   }, [customPopup]);
-
   useEffect(() => {
     const tempUserArray: SetStateAction<any[]> = [];
     data.map((node, key) => {
@@ -637,9 +635,9 @@ export const PengajuanTable = (props: { role?: String }) => {
             </div>
           )
         }
-      ></Table>
+      />
 
-      {props.role === "staff" && (
+      {props.role === "staffgudang" && (
         <button
           className="flex w-full bg-slate-500 p-4 justify-center items-center text-white rounded-lg mt-4"
           onClick={() => {
@@ -656,15 +654,13 @@ export const PengajuanTable = (props: { role?: String }) => {
           setCustomPopup(null);
         }}
       >
-        {props.role === "staff" ? (
+        {props.role === "staffgudang" ? (
           currentPermohonanStatus === "Dana Terkirim" ? (
             <div>
               <ImageUploading
                 multiple
                 value={images}
                 onChange={(imageList, addUpdateIndex) => {
-                  // data for submit
-                  console.log(imageList, addUpdateIndex);
                   setImages(imageList);
                 }}
                 maxNumber={10}
@@ -678,14 +674,17 @@ export const PengajuanTable = (props: { role?: String }) => {
                   isDragging,
                   dragProps,
                 }) => (
-                  // write your building UI
-                  <div className="upload__image-wrapper flex flex-col max-h-[500px] overflow-auto items-center">
+                  <div
+                    key={"imglist"}
+                    className="upload__image-wrapper flex flex-col max-h-[500px] overflow-auto items-center"
+                  >
                     {imageList.map((image, index) => (
                       <div
                         key={index}
                         className="flex flex-col items-center image-item"
                       >
                         <img
+                          key={index}
                           className="opacity-1 transition-all hover:opacity-0"
                           src={image["data_url"]}
                           onClick={() => {
@@ -697,7 +696,7 @@ export const PengajuanTable = (props: { role?: String }) => {
                           alt=""
                           width="100"
                         />
-                        <div className="image-item__btn-wrapper">
+                        <div key={index} className="image-item__btn-wrapper">
                           <button onClick={() => onImageUpdate(index)}>
                             Ganti Foto
                           </button>
@@ -761,9 +760,6 @@ export const PengajuanTable = (props: { role?: String }) => {
                   </div>
                 )}
               </ImageUploading>
-              {/* <form action="submit">
-              <button type="submit">Upload Nota</button>
-            </form> */}
             </div>
           ) : (
             <div>Dana belum terkirim!</div>
@@ -783,7 +779,6 @@ export const PengajuanTable = (props: { role?: String }) => {
             multiple
             value={images}
             onChange={(imageList, addUpdateIndex) => {
-              // data for submit
               console.log(imageList, addUpdateIndex);
               setImages(imageList);
             }}
@@ -791,14 +786,17 @@ export const PengajuanTable = (props: { role?: String }) => {
             dataURLKey="data_url"
           >
             {({ imageList }) => (
-              // write your building UI
-              <div className="upload__image-wrapper flex flex-col max-h-[500px] overflow-auto items-center">
+              <div
+                key={"imglist"}
+                className="upload__image-wrapper flex flex-col max-h-[500px] overflow-auto items-center"
+              >
                 {imageList.map((image, index) => (
                   <div
                     key={index}
                     className="flex flex-col items-center image-item"
                   >
                     <img
+                      key={index}
                       className="opacity-1 transition-all hover:opacity-0"
                       src={image["data_url"]}
                       onClick={() => {
@@ -815,9 +813,6 @@ export const PengajuanTable = (props: { role?: String }) => {
               </div>
             )}
           </ImageUploading>
-          {/* <form action="submit">
-              <button type="submit">Upload Nota</button>
-            </form> */}
         </div>
       </Popup>
       <Popup
@@ -841,7 +836,6 @@ export const PengajuanTable = (props: { role?: String }) => {
               for (var i = 0; i < dataLength - 2; i++) {
                 data.push(e.target.elements[i].value);
                 const val = e.target.elements[i].value;
-                // console.log(e.target.elements[i].value);
                 i % 4 === 0 && val === "barang" ? (barangId = "1") : {};
                 i % 4 === 1 && barangId === "1" ? (barangId = val) : {};
                 console.log(val);
@@ -882,7 +876,6 @@ export const PengajuanTable = (props: { role?: String }) => {
                 );
               });
               setTambahData(null);
-              //please add more mechanisms here
             }}
           >
             {barangDiajukanLength.map((v, k) => {
@@ -944,6 +937,7 @@ export const PengajuanTable = (props: { role?: String }) => {
                   />
                   <input
                     readOnly
+                    key={k.toString() + "proyek"}
                     value={
                       barangDiajukanLength[k] != -1
                         ? (namaProyeks[barangDiajukanLength[k]] as string)
@@ -970,15 +964,12 @@ export const PengajuanTable = (props: { role?: String }) => {
     <div />
   );
 };
-
 export const SaldoTable = () => {
   const [shownData, setShownData] = useState<any[]>([]);
   useEffect(() => {
     User.getUsersByRole("staffgudang").then((users) => {
       const tempData: any[] = [];
       users.forEach((user) => {
-        console.log(user);
-
         tempData.push({ name: user.username, saldo: user.saldo });
       });
       setShownData(tempData);

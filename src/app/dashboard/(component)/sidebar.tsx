@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { User } from "../(entities)/user";
 
 const Sidebar = (props: { pages: { name: String; page: JSX.Element }[] }) => {
   const [selectedPage, setSelectedPage] = useState(0);
   const [isSidebarCollapsed, setIsSideBarCollapsed] = useState(true);
+  const [saldo, setSaldo] = useState<String>();
+  useEffect(() => {});
+
   return (
     <div className={`flex flex-row h-screen w-screen`}>
       <div className="flex flex-row ">
@@ -12,6 +15,9 @@ const Sidebar = (props: { pages: { name: String; page: JSX.Element }[] }) => {
             isSidebarCollapsed ? " overflow-hidden w-[0%] hidden" : ""
           }`}
         >
+          <div className=" cursor-pointer px-8 py-2 flex mb-64 text-white w-full align-self-end bg-slate-800">
+            Saldo: {}
+          </div>
           {props.pages.map((node, key) => {
             return (
               <div

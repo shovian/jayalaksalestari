@@ -8,7 +8,6 @@ const Keuangan = () => {
   useEffect(() => {
     Inventori.getAllBarangs().then((barangs) => {
       Proyek.getAllProyek().then((proyeks) => {
-        console.log(proyeks);
         const tempData = [] as any[];
         proyeks.forEach((proyek) => {
           const tempBarangs = barangs.filter((barang) => {

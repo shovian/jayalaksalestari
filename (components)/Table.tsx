@@ -119,7 +119,7 @@ const Table: React.FC<ITable> = ({
     <div>
       <table className="table">
         <thead>
-          <tr>
+          <tr key={"tr"}>
             {columns.map((column) => (
               <th key={column.key} onClick={() => handleSort(column.key)}>
                 {column.label}
@@ -128,19 +128,17 @@ const Table: React.FC<ITable> = ({
                 )}
               </th>
             ))}
-            {actionable && <th>Actions</th>}
+            {actionable && <th key={"action"}>Actions</th>}
           </tr>
         </thead>
         <tbody>
-          {currentItems.map((item) => (
-            <tr key={item.id}>
+          {currentItems.map((item, key) => (
+            <tr key={key}>
               {columns.map((column) => (
-                <td key={`${item.id}-${column.key}`}>
-                  {render(item[column.key])}
-                </td>
+                <td key={`${key}-${column.key}`}>{render(item[column.key])}</td>
               ))}
               {actionable && (
-                <td>
+                <td key={`${key}-`}>
                   <div className="flex flex-row">
                     {
                       <div onClick={() => handleCustom(item.id)}>

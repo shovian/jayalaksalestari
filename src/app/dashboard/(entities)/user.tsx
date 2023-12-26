@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { app } from "../../../../(context)/FirebaseContext";
 import {
   collection,
@@ -6,7 +5,6 @@ import {
   getDoc,
   getDocs,
   getFirestore,
-  onSnapshot,
   query,
   setDoc,
   where,
@@ -64,8 +62,6 @@ export class User {
       newUser["username"] = fetchedData.username;
       newUser["password"] = fetchedData.password;
       newUser["role"] = fetchedData.role;
-      console.log("#", doc.data());
-
       newUser["saldo"] = fetchedData.saldo;
       users.push(newUser);
     });
