@@ -8,6 +8,7 @@ import {
   getFirestore,
   onSnapshot,
   query,
+  setDoc,
   where,
 } from "firebase/firestore";
 
@@ -21,7 +22,10 @@ export class User {
   public login(username: String, password: String) {
     //login logic here
   }
-
+  public async setSaldo(saldo: String) {
+    const userRef = doc(db, "users", this.id as string);
+    await setDoc(userRef, { saldo: saldo }, { merge: true });
+  }
   public static getCurrentUserRole() {
     return localStorage.getItem("role");
   }
@@ -60,6 +64,9 @@ export class User {
       newUser["username"] = fetchedData.username;
       newUser["password"] = fetchedData.password;
       newUser["role"] = fetchedData.role;
+      console.log("#", doc.data());
+
+      newUser["saldo"] = fetchedData.saldo;
       users.push(newUser);
     });
     return users;
@@ -73,6 +80,7 @@ export class User {
     newUser["username"] = fetchedData.username;
     newUser["password"] = fetchedData.password;
     newUser["role"] = fetchedData.role;
+    newUser["saldo"] = fetchedData.saldo;
     return newUser;
   }
 }

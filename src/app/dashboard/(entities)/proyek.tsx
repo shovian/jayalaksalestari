@@ -52,7 +52,7 @@ export class Proyek implements TProyek {
   }
   public static async getNamaProyekById(id?: String) {
     const namaProyek = id ? (await Proyek.getProyekById(id)).namaProyek : "";
-    return namaProyek;
+    return namaProyek || "";
   }
   public static async getProyekById(id: String) {
     const proyekRef = doc(db, "proyek", id as string);

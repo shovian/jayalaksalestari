@@ -10,6 +10,8 @@ import { User } from "../(entities)/user";
 import { Absensi } from "../(entities)/absensi";
 import { Timestamp } from "firebase/firestore";
 
+import ImageUploading, { ImageListType } from "react-images-uploading";
+
 export const BarangTable = (props: {
   header: ITableColumn[];
   data: any[];
@@ -48,15 +50,15 @@ export const BarangTable = (props: {
                     // console.log(e.target.elements[1].value, customPopup); // this should be changed to put barang into project
                     const idBarang = customPopup;
                     const idProyek = e.target.elements[1].value;
-                    console.log(idProyek);
+                    // console.log(idProyek);
 
-                    // idBarang
-                    //   ? Inventori.putBarangIntoProyek(
-                    //       idBarang,
-                    //       idProyek,
-                    //       e.target.elements[0].value
-                    //     )
-                    //   : {};
+                    idBarang
+                      ? Inventori.putBarangIntoProyek(
+                          idBarang,
+                          idProyek,
+                          e.target.elements[0].value
+                        )
+                      : {};
                     setCustomPopupComponent(undefined);
                   }}
                   action="submit"
@@ -158,7 +160,6 @@ export const BarangTable = (props: {
       });
   }, [editPopup]);
   useEffect(() => {
-    const inv = Inventori;
     // console.log(editPopup);
     const barang: Barang = new Barang();
     barang.name = "";
@@ -179,6 +180,7 @@ export const BarangTable = (props: {
             Object.keys(barang).map((attr, key) => {
               (barangNew as any)[attr] = e.target.elements[key].value;
             });
+            barangNew["idProyek"] = "";
             Inventori.createBarang(barangNew);
           }}
         >
@@ -498,7 +500,6 @@ export const AbsensiTable = () => {
       // console.log(k, doc);
       doc &&
         User.getNamaById(doc.idKaryawan as string).then((nama) => {
-          console.log(nama);
           const tempDoc = doc;
           tempDoc["nama"] = nama;
           const tempDate = doc.date as Timestamp;
@@ -524,37 +525,61 @@ export const AbsensiTable = () => {
 };
 export const PengajuanTable = (props: { role?: String }) => {
   const [forceRerender, setForceRerender] = useState(true);
+  const [images, setImages] = useState<ImageListType>([]);
   const [data, setData] = useState<Permohonan[]>([]);
   const [shownData, setShownData] = useState<any[]>([]);
   const [barangDiajukanLength, setBarangDiajukanLength] = useState([0]);
   const [tambahData, setTambahData] = useState<string | null>(null);
   const [keperluanOrBarang, setKeperluanOrBarang] = useState<boolean[]>([]);
-  const [barangs, setBarangs] = useState<Barang[]>([]);
+  const [barangs, setBarangs] = useState<Barang[]>();
+  const [namaProyeks, setNamaProyeks] = useState<String[]>();
   const [customPopup, setCustomPopup] = useState<string | null>(null);
-
-  useEffect(() => {
-    customPopup &&
-      Permohonan.getPermohonanById(customPopup as String).then((permohonan) => {
-        if (props.role === "adminkeuangan") {
-          User.getUserById(permohonan.idUser as string).then((user) => {
-            user.saldo = permohonan.totalDana;
-          });
-        }
-        permohonan.setStatus(
-          props.role === "adminkeuangan"
-            ? "Dana Terkirim"
-            : props.role === "pemilik"
-            ? "Disetujui"
-            : "Diajukan"
-        );
-      });
-  }, [customPopup]);
+  const [ViewDetail, setViewDetail] = useState<string | null>(null);
+  const [currentPermohonanStatus, setCurrentPermohonanStatus] =
+    useState<String | null>(null);
   useEffect(() => {
     Permohonan.subscribeDatabase(setData);
     Inventori.getAllBarangs().then((barangs) => {
       setBarangs(barangs);
+      const tempNamaProyeks: String[] = [];
+      barangs?.forEach((barang) => {
+        Proyek.getNamaProyekById(barang.idProyek).then((namaProyek) => {
+          tempNamaProyeks.push(namaProyek);
+          if (barangs?.length === tempNamaProyeks.length)
+            setNamaProyeks(tempNamaProyeks);
+        });
+      });
     });
   }, []);
+  useEffect(() => {
+    customPopup &&
+      Permohonan.getPermohonanById(customPopup as String).then((permohonan) => {
+        setCurrentPermohonanStatus(permohonan.status || null);
+        const tempImages = permohonan.bukti
+          ? JSON.parse(permohonan.bukti as string)
+          : [];
+        setImages(tempImages);
+        if (props.role === "adminkeuangan") {
+          User.getUserById(permohonan.idUser as string).then((user) => {
+            user.saldo = permohonan.totalDana;
+          });
+        } else if (props.role === "staff") {
+        }
+        switch (props.role) {
+          case "adminkeuangan": {
+            permohonan.status === "Disetujui" &&
+              permohonan.setStatus("Dana Terkirim");
+            break;
+          }
+          case "pemilik": {
+            permohonan.status === "Diajukan" &&
+              permohonan.setStatus("Disetujui");
+            break;
+          }
+        }
+      });
+  }, [customPopup]);
+
   useEffect(() => {
     const tempUserArray: SetStateAction<any[]> = [];
     data.map((node, key) => {
@@ -574,8 +599,8 @@ export const PengajuanTable = (props: { role?: String }) => {
       // setShownData({})
     });
   }, [data]);
-
-  return (
+  var danaTerpakai: String;
+  return namaProyeks ? (
     <div>
       <Table
         columns={[
@@ -588,6 +613,16 @@ export const PengajuanTable = (props: { role?: String }) => {
         actionable={true}
         canEdit={false}
         canDelete={false}
+        onViewDetail={(id) => {
+          Permohonan.getPermohonanById(id).then((permohonan) => {
+            const tempImages = permohonan.bukti
+              ? JSON.parse(permohonan.bukti as string)
+              : [];
+            setImages(tempImages);
+            setViewDetail(id);
+            console.log(tempImages);
+          });
+        }}
         onCustom={(id) => {
           setCustomPopup(id);
         }}
@@ -598,22 +633,17 @@ export const PengajuanTable = (props: { role?: String }) => {
                 ? "Konfirmasi Transfer"
                 : props.role === "pemilik"
                 ? "Setujui"
-                : ""}
+                : "Upload Nota"}
             </div>
           )
         }
       ></Table>
 
-      {props.role === undefined && (
+      {props.role === "staff" && (
         <button
           className="flex w-full bg-slate-500 p-4 justify-center items-center text-white rounded-lg mt-4"
           onClick={() => {
-            const newPermohonan = new Permohonan();
-            newPermohonan["idUser"] = User.getCurrentUserId() || undefined;
-            newPermohonan["pengajuanDate"] = Timestamp.fromDate(new Date());
-            Permohonan.createPermohonan(newPermohonan).then((id) => {
-              setTambahData(id as string);
-            });
+            setTambahData("occupied");
           }}
         >
           Buat Pengajuan
@@ -625,8 +655,171 @@ export const PengajuanTable = (props: { role?: String }) => {
         onClosePopup={function () {
           setCustomPopup(null);
         }}
-      ></Popup>
-
+      >
+        {props.role === "staff" ? (
+          currentPermohonanStatus === "Dana Terkirim" ? (
+            <div>
+              <ImageUploading
+                multiple
+                value={images}
+                onChange={(imageList, addUpdateIndex) => {
+                  // data for submit
+                  console.log(imageList, addUpdateIndex);
+                  setImages(imageList);
+                }}
+                maxNumber={10}
+                dataURLKey="data_url"
+              >
+                {({
+                  imageList,
+                  onImageUpload,
+                  onImageUpdate,
+                  onImageRemove,
+                  isDragging,
+                  dragProps,
+                }) => (
+                  // write your building UI
+                  <div className="upload__image-wrapper flex flex-col max-h-[500px] overflow-auto items-center">
+                    {imageList.map((image, index) => (
+                      <div
+                        key={index}
+                        className="flex flex-col items-center image-item"
+                      >
+                        <img
+                          className="opacity-1 transition-all hover:opacity-0"
+                          src={image["data_url"]}
+                          onClick={() => {
+                            const newImage = new Image();
+                            newImage.src = image["data_url"];
+                            const w = window.open("");
+                            w!.document.write(newImage.outerHTML);
+                          }}
+                          alt=""
+                          width="100"
+                        />
+                        <div className="image-item__btn-wrapper">
+                          <button onClick={() => onImageUpdate(index)}>
+                            Ganti Foto
+                          </button>
+                          <button
+                            className="mx-4 text-red-500"
+                            onClick={() => onImageRemove(index)}
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      className="flex flex-col items-center border-2 p-5 rounded-lg"
+                      style={isDragging ? { color: "red" } : undefined}
+                      onClick={onImageUpload}
+                      {...dragProps}
+                    >
+                      Tambahkan Nota
+                      <img
+                        height={100}
+                        width={100}
+                        src="https://t4.ftcdn.net/jpg/04/81/13/43/360_F_481134373_0W4kg2yKeBRHNEklk4F9UXtGHdub3tYk.jpg"
+                      ></img>
+                    </button>
+                    <input
+                      onChange={(e: any) => {
+                        danaTerpakai = e.target.value;
+                      }}
+                      type="text"
+                      placeholder="Dana Terpakai"
+                    ></input>
+                    <div>
+                      <button
+                        onClick={() => {
+                          Permohonan.getPermohonanById(customPopup!).then(
+                            (permohonan) => {
+                              User.getUserById(
+                                permohonan.idUser as string
+                              ).then((user) => {
+                                const currentSaldo = parseInt(
+                                  (user.saldo || "0") as string
+                                );
+                                const saldoTerpakai = parseInt(
+                                  (danaTerpakai || "0") as string
+                                );
+                                user.setSaldo(
+                                  (currentSaldo - saldoTerpakai).toString()
+                                );
+                              });
+                              permohonan.setBukti(JSON.stringify(imageList));
+                            }
+                          );
+                          setCustomPopup(null);
+                        }}
+                        className="bg-slate-200 p-2 rounded-lg"
+                      >
+                        Upload Semua Nota
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </ImageUploading>
+              {/* <form action="submit">
+              <button type="submit">Upload Nota</button>
+            </form> */}
+            </div>
+          ) : (
+            <div>Dana belum terkirim!</div>
+          )
+        ) : (
+          <div></div>
+        )}
+      </Popup>
+      <Popup
+        id={ViewDetail}
+        onClosePopup={function () {
+          setViewDetail(null);
+        }}
+      >
+        <div>
+          <ImageUploading
+            multiple
+            value={images}
+            onChange={(imageList, addUpdateIndex) => {
+              // data for submit
+              console.log(imageList, addUpdateIndex);
+              setImages(imageList);
+            }}
+            maxNumber={10}
+            dataURLKey="data_url"
+          >
+            {({ imageList }) => (
+              // write your building UI
+              <div className="upload__image-wrapper flex flex-col max-h-[500px] overflow-auto items-center">
+                {imageList.map((image, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center image-item"
+                  >
+                    <img
+                      className="opacity-1 transition-all hover:opacity-0"
+                      src={image["data_url"]}
+                      onClick={() => {
+                        const newImage = new Image();
+                        newImage.src = image["data_url"];
+                        const w = window.open("");
+                        w!.document.write(newImage.outerHTML);
+                      }}
+                      alt=""
+                      width="300"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </ImageUploading>
+          {/* <form action="submit">
+              <button type="submit">Upload Nota</button>
+            </form> */}
+        </div>
+      </Popup>
       <Popup
         id={tambahData}
         onClosePopup={function (): void {
@@ -636,22 +829,59 @@ export const PengajuanTable = (props: { role?: String }) => {
       >
         <div>
           <form
-            className="grid grid-cols-3"
+            className="grid grid-cols-4"
             onSubmit={(e: any) => {
               e.preventDefault();
               const data: any[] = [];
+              const newPermohonan = new Permohonan();
               const dataLength = e.target.elements.length;
+              const biayas: number[] = [0];
+              const barangs: String[] = [];
+              var barangId = "-1";
               for (var i = 0; i < dataLength - 2; i++) {
-                // data.push(e.target.elements[i].value);
-                console.log(e.target.elements[i].value);
-              }
-              Permohonan.getPermohonanById(tambahData as String).then(
-                (permohonan: Permohonan) => {
-                  console.log(permohonan);
+                data.push(e.target.elements[i].value);
+                const val = e.target.elements[i].value;
+                // console.log(e.target.elements[i].value);
+                i % 4 === 0 && val === "barang" ? (barangId = "1") : {};
+                i % 4 === 1 && barangId === "1" ? (barangId = val) : {};
+                console.log(val);
 
-                  // permohonan.setLinkDoc(JSON.stringify(data));
-                }
-              );
+                i % 4 === 2 && barangId != "-1"
+                  ? Inventori.getBarangById(barangId).then((barang) => {
+                      const price = (
+                        parseInt(val) / parseInt(barang.quantity as string)
+                      ).toString();
+                      console.log(barangId);
+                      delete barang["id"];
+                      barang["price"] = price;
+                      console.log(barang);
+                      Inventori.updateBarangById(barangId, {
+                        price: price,
+                      }).then(() => {
+                        barangId = "-1";
+                      });
+                    })
+                  : {};
+                i % 4 === 2 ? (biayas[0] += parseInt(val)) : {};
+              }
+
+              newPermohonan["idUser"] = User.getCurrentUserId() || undefined;
+              newPermohonan["pengajuanDate"] = Timestamp.fromDate(new Date());
+              newPermohonan["totalDana"] = biayas[0].toString();
+              newPermohonan["status"] = "Diajukan";
+              User.getUserById(newPermohonan.idUser as String).then((user) => {
+                user.setSaldo(biayas[0].toString());
+              });
+              Permohonan.createPermohonan(newPermohonan).then((id) => {
+                Permohonan.getPermohonanById(id as String).then(
+                  (permohonan: Permohonan) => {
+                    // console.log(permohonan);
+
+                    permohonan.setLinkDoc(JSON.stringify(data));
+                  }
+                );
+              });
+              setTambahData(null);
               //please add more mechanisms here
             }}
           >
@@ -668,6 +898,12 @@ export const PengajuanTable = (props: { role?: String }) => {
                       const tempKOrB = keperluanOrBarang;
                       tempKOrB[k] = a === 0;
                       setKeperluanOrBarang(tempKOrB);
+                      keperluanOrBarang[k] == true
+                        ? (barangDiajukanLength[k] = 0)
+                        : (barangDiajukanLength[k] = -1);
+                      console.log(namaProyeks);
+
+                      setBarangDiajukanLength(barangDiajukanLength);
                       setForceRerender((prevState) => !prevState);
                     }}
                     name="Barang/Keperluan"
@@ -677,9 +913,21 @@ export const PengajuanTable = (props: { role?: String }) => {
                     <option value="keperluan">Keperluan Lain</option>
                   </select>
                   {keperluanOrBarang[k] == true ? (
-                    <select>
-                      {barangs.map((barang, key) => {
-                        return <option key={key}>{barang.name}</option>;
+                    <select
+                      onChange={(e: any) => {
+                        barangDiajukanLength[k] = e.target.selectedIndex;
+                        const tempDiajukan = barangDiajukanLength;
+                        console.log(tempDiajukan);
+                        setBarangDiajukanLength(tempDiajukan);
+                        setForceRerender((prevState) => !prevState);
+                      }}
+                    >
+                      {barangs?.map((barang, key) => {
+                        return (
+                          <option value={barang.id as string} key={key}>
+                            {barang.name}
+                          </option>
+                        );
                       })}
                     </select>
                   ) : (
@@ -694,13 +942,21 @@ export const PengajuanTable = (props: { role?: String }) => {
                     type="text"
                     placeholder="Biaya"
                   />
+                  <input
+                    readOnly
+                    value={
+                      barangDiajukanLength[k] != -1
+                        ? (namaProyeks[barangDiajukanLength[k]] as string)
+                        : ""
+                    }
+                  ></input>
                 </>
               );
             })}
             <button
               type="button"
               onClick={() => {
-                setBarangDiajukanLength([...barangDiajukanLength, 0]);
+                setBarangDiajukanLength([...barangDiajukanLength, -1]);
               }}
             >
               +Barang/Keperluan
@@ -709,6 +965,35 @@ export const PengajuanTable = (props: { role?: String }) => {
           </form>
         </div>
       </Popup>
+    </div>
+  ) : (
+    <div />
+  );
+};
+
+export const SaldoTable = () => {
+  const [shownData, setShownData] = useState<any[]>([]);
+  useEffect(() => {
+    User.getUsersByRole("staffgudang").then((users) => {
+      const tempData: any[] = [];
+      users.forEach((user) => {
+        console.log(user);
+
+        tempData.push({ name: user.username, saldo: user.saldo });
+      });
+      setShownData(tempData);
+    });
+  }, []);
+  return (
+    <div>
+      <Table
+        columns={[
+          { label: "Nama Staff", key: "name" },
+          { label: "Saldo", key: "saldo" },
+        ]}
+        data={shownData}
+        actionable={false}
+      ></Table>
     </div>
   );
 };

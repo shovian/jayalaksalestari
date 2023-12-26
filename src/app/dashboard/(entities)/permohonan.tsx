@@ -17,6 +17,7 @@ export class Permohonan {
   pengajuanDate?: Timestamp | Date;
   status?: String;
   totalDana?: String;
+  bukti?: String;
   private static makeObject(id: String, fetchedData: Permohonan) {
     const permohonan = new Permohonan();
     permohonan["id"] = id;
@@ -27,8 +28,13 @@ export class Permohonan {
     ).toDate();
     permohonan["status"] = fetchedData.status;
     permohonan["totalDana"] = fetchedData.totalDana;
+    permohonan["bukti"] = fetchedData.bukti;
 
     return permohonan;
+  }
+  public async setBukti(bukti: String) {
+    const permRef = doc(db, "permohonan", this.id as string);
+    await setDoc(permRef, { bukti: bukti }, { merge: true });
   }
   public async setStatus(status: String) {
     const permRef = doc(db, "permohonan", this.id as string);

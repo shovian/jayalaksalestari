@@ -9,6 +9,8 @@ import Pendanaan from "./(pages)/daftardanatersetujui";
 import Persetujuan from "./(pages)/persetujuanDana";
 import { User } from "./(entities)/user";
 import { Absensi } from "./(entities)/absensi";
+import Saldo from "./(pages)/daftarsaldo";
+import Keuangan from "./(pages)/keuangan";
 
 const Dashboard = () => {
   const [alreadyAbsensi, setAlreadyAbsensi] = useState<boolean>(false);
@@ -41,7 +43,7 @@ const Dashboard = () => {
     }
   }, []);
   const pageList =
-    currentUserRole === ""
+    currentUserRole === "engineer"
       ? [
           { name: "Daftar Barang", page: <DaftarBarang /> },
           { name: "Daftar Proyek", page: <DaftarProyek /> },
@@ -49,6 +51,8 @@ const Dashboard = () => {
           { name: "Daftar Dana Tersetujui", page: <Pendanaan /> },
           { name: "Persetujuan Dana", page: <Persetujuan /> },
           { name: "Pengajuan Dana", page: <Pengajuan /> },
+          { name: "Daftar Saldo", page: <Saldo /> },
+          { name: "Keuangan", page: <Keuangan /> },
         ]
       : currentUserRole === "pemilik"
       ? [
@@ -56,12 +60,16 @@ const Dashboard = () => {
           { name: "Daftar Proyek", page: <DaftarProyek /> },
           { name: "Absensi", page: <AbsensiPage /> },
           { name: "Persetujuan Dana", page: <Persetujuan /> },
+          { name: "Daftar Saldo", page: <Saldo /> },
+          { name: "Keuangan", page: <Keuangan /> },
         ]
       : currentUserRole === "adminkeuangan"
       ? [
           { name: "Daftar Barang", page: <DaftarBarang /> },
           { name: "Daftar Proyek", page: <DaftarProyek /> },
           { name: "Daftar Dana Tersetujui", page: <Pendanaan /> },
+          { name: "Daftar Saldo", page: <Saldo /> },
+          { name: "Keuangan", page: <Keuangan /> },
         ]
       : currentUserRole === "adminhrd"
       ? [
@@ -75,6 +83,8 @@ const Dashboard = () => {
           { name: "Daftar Proyek", page: <DaftarProyek /> },
           { name: "Absensi", page: <AbsensiPage /> },
           { name: "Pengajuan Dana", page: <Pengajuan /> },
+          { name: "Daftar Saldo", page: <Saldo /> },
+          { name: "Keuangan", page: <Keuangan /> },
         ]
       : [
           { name: "Daftar Barang", page: <DaftarBarang /> },

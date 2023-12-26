@@ -88,11 +88,7 @@ export class Inventori {
     tempBarang["description"] = fetchedData.description;
     return tempBarang;
   }
-  public static async getBarangsByIdProyek(id: String) {
-    //not implemented yet
-    const x = [] as Barang[];
-    return x;
-  }
+
   public static async putBarangIntoProyek(
     idBarang: String,
     idProyek: String | undefined,
@@ -127,26 +123,12 @@ export class Inventori {
     oldBarang["quantity"] = (
       parseInt(oldBarang.quantity as string) - parseInt(quantity as string)
     ).toString();
+    console.log(oldBarang);
 
+    // oldBarang["idProyek"] === undefined ? delete oldBarang["idProyek"] : {};
     parseInt(oldBarang["quantity"] as string) > 0
       ? Inventori.createBarang(oldBarang)
       : {};
-
-    // const barang: Barang = {
-    //   ...oldBarang,
-    //   quantity: (
-    //     parseInt(oldBarang.quantity as string) - parseInt(quantity as string)
-    //   ).toString(),
-    // };
-    // barang.quantity === "0"
-    //   ? inv.deleteBarangById(idBarang)
-    //   : inv.updateBarangById(idBarang, barang);
-    // oldBarang["id"] = undefined;
-    // Inventori.createBarang({
-    //   ...oldBarang,
-    //   quantity: quantity,
-    //   idProyek: idProyek,
-    // });
   }
   public static async getAllBarangs() {
     //dipanggil oleh yang bisa melihat barang saja
