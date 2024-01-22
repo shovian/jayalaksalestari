@@ -28,7 +28,7 @@ const DaftarBarang = () => {
   }, [data]);
   const tableColumns: ITableColumn[] = [
     { key: "name", label: "Nama" },
-    { key: "namaProyek", label: "Nama Proyek" },
+    // { key: "namaProyek", label: "Nama Proyek" },
     { key: "itemType", label: "Jenis Barang" },
     { key: "quantity", label: "Tersedia" },
     { key: "budget", label: "Budget" },

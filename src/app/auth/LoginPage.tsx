@@ -9,8 +9,6 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    // console.log(User.getCurrentUserRole() !== null);
-
     if (User.getCurrentUserRole() !== null) {
       router.push("/dashboard");
     }
@@ -33,34 +31,17 @@ const LoginPage = () => {
       body: JSON.stringify(params),
     });
     const data: { res: { id: String; role: String } } = await res.json();
-
-    // Perform any necessary form validation or data processing
-    // e.g., validate username and password, make API requests, etc.
-
     if (username.trim() === "") {
-      // Display an error message or perform other actions for invalid username
-      console.log("Username is required");
+      alert("Username is required");
       return;
     }
-
     if (password.trim() === "") {
-      // Display an error message or perform other actions for invalid password
-      console.log("Password is required");
+      alert("Password is required");
       return;
     }
-    // let cookie = request.
-    // Example: Log the form data to the console
-    // console.log("Form submitted:");
-    // console.log("Username:", data.res);
-    // console.log("Password:", password);
-
-    // Reset the form fields
     setUsername("");
     setPassword("");
-    // Handle further actions, such as displaying success messages or navigating to another page
-
     User.setCurrentUserRole(data.res.role);
-
     User.setCurrentUserId(data.res.id);
     data.res === undefined ? console.log("failed") : router.push("/dashboard");
   };

@@ -59,7 +59,10 @@ const Sidebar = (props: { pages: { name: String; page: JSX.Element }[] }) => {
           {isSidebarCollapsed ? ">" : "<"}
         </div>
       </div>
-      <div className="flex relative bg-white w-[100%]">
+      <div className="flex relative flex-col bg-white w-[100%]">
+        <h1 className="flex p-8 text-lg bg-slate-200 font-bold">
+          {"Jaya Laksa Lestari WMS"}
+        </h1>
         {props.pages[selectedPage].page}
       </div>
     </div>

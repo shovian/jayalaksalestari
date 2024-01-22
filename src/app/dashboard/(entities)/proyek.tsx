@@ -10,7 +10,6 @@ import {
   onSnapshot,
   setDoc,
 } from "firebase/firestore";
-import { Barang } from "./barang";
 import { Inventori } from "./inventori";
 
 const db = getFirestore(app);

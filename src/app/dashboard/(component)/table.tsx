@@ -228,14 +228,14 @@ export const BarangTable = (props: {
                 {">"}
               </div>
             )}
-            <div
+            {/* <div
               onClick={() => {
                 setCustomPopupComponentType("assign");
               }}
               className="cursor-pointer text-slate-800"
             >
               {"+Proyek"}
-            </div>
+            </div> */}
           </div>
         }
       ></Table>
@@ -286,7 +286,13 @@ export const ProyekTable = (props: { header: ITableColumn[]; data: any[] }) => {
     useState<JSX.Element>();
   const [editPopup, setEditPopup] = useState<string | null>(null);
   const [editPopupComponent, setEditPopupComponent] = useState<JSX.Element>();
+  const [putBarang, setputBarang] = useState<string | null>(null);
+  const [barangs, setBarangs] = useState<Barang[]>([]);
+
   useEffect(() => {
+    Inventori.getAllBarangs().then((barangs) => {
+      setBarangs(barangs);
+    });
     detailPopup &&
       new Proyek().getBarangsById(detailPopup).then((barangs) => {
         setDetailPopupComponent(
@@ -354,6 +360,15 @@ export const ProyekTable = (props: { header: ITableColumn[]; data: any[] }) => {
                 </div>
               );
             })}
+            <button
+              className="bg-slate-200 p-4 rounded-md"
+              onClick={() => {
+                setputBarang(detailPopup);
+                console.log(putBarang);
+              }}
+            >
+              {"Tambahkan Barang ke Proyek Ini"}
+            </button>
           </div>
         );
       });
@@ -482,6 +497,51 @@ export const ProyekTable = (props: { header: ITableColumn[]; data: any[] }) => {
         }}
       >
         {editPopupComponent}
+      </Popup>
+      <Popup
+        id={putBarang}
+        onClosePopup={() => {
+          setputBarang(null);
+        }}
+      >
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={(e: any) => {
+            e.preventDefault();
+            // console.log(e.target.elements[1].value, customPopup); // this should be changed to put barang into project
+            const idProyek = putBarang;
+            const idBarang = e.target.elements[1].value;
+            // console.log(idProyek);
+
+            idProyek
+              ? Inventori.putBarangIntoProyek(
+                  idBarang,
+                  idProyek,
+                  e.target.elements[0].value
+                )
+              : {};
+            setputBarang(null);
+          }}
+          action="submit"
+        >
+          <input
+            id="quantity"
+            type="number"
+            placeholder="Jumlah Barang"
+          ></input>
+          <select name="barang" id="barang">
+            {barangs.map((barang) => {
+              return barang.name ? (
+                <option value={barang.id as string}>{barang.name}</option>
+              ) : (
+                <div></div>
+              );
+            })}
+          </select>
+          <button className="text-white bg-slate-500 flex w-full justify-center p-4 rounded-lg my-4">
+            Tambahkan Barang ke Proyek
+          </button>
+        </form>
       </Popup>
     </div>
   );
